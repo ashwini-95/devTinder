@@ -1,21 +1,30 @@
 const express = require("express");
+const { connectDB } = require("./config/database");
+const { User } = require("./models/user");
 const app = express();
-const { adminAuth, userAuth } = require("./middlewares/auth");
 
-app.get("/getalldata", (req, res) => {
+app.post("/signup", async (req, res) => {
+  const user = new User({
+    firstName: "John",
+    lastName: "Kerl",
+    emailId: "johnkerl@gmail.com",
+    password: "john@123",
+  });
   try {
-    throw new Error("asfsdfsdf");
-    res.send("data sent!!");
+    await user.save();
+    res.send("user added succesfully");
   } catch (error) {
-    res.status(500).send("some Error occured");
+    res.status(400).send("Error in adding user to the database");
   }
 });
-//prefer try catch instead of this
-app.use("/", (err, req, res, next) => {
-  if (err) {
-    res.status(500).send("Unexpected Error");
-  }
-});
-app.listen(4001, () => {
-  console.log("App is listening on 4001..");
-});
+
+connectDB()
+  .then(() => {
+    console.log("Database connected succesfully!!!");
+    app.listen(4001, () => {
+      console.log("App is listening on 4001..!!");
+    });
+  })
+  .catch((err) => {
+    console.error("Database cannot be connected!, Please try again");
+  });
