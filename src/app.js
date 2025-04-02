@@ -53,13 +53,32 @@ app.patch("/user", async (req, res) => {
   try {
     const userId = req.body.userId;
     const data = req.body;
+    const allowedUpdates = [
+      "userId",
+      "firstName",
+      "lastName",
+      "age",
+      "skills",
+      "photoUrl",
+      "about",
+    ];
+    const updateAllowed = Object.keys(data).every((k) =>
+      allowedUpdates.includes(k)
+    );
+    if (!updateAllowed) {
+      throw new Error("update is not allowed");
+    }
+    if (data?.skills?.length > 3) {
+      throw new Error("skills cnnot be more than 3");
+    }
     const newUser = await User.findByIdAndUpdate({ _id: userId }, data, {
       returnDocument: "after",
+      runValidators: true,
     });
     console.log(newUser);
     res.send("user updated successfully");
   } catch (error) {
-    res.status(400).send("some error occured");
+    res.status(400).send("Update Failed :" + error.message);
   }
 });
 connectDB()

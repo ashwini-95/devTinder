@@ -1,10 +1,20 @@
 const mongoose = require("mongoose");
-
+const validator = require("validator");
 const userSchema = new mongoose.Schema(
   {
     firstName: { type: String, required: true, minLength: 3, maxLength: 30 },
     lastName: { type: String },
-    emailId: { type: String, required: true, unique: true, lowercase: true },
+    emailId: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      maxLength: 50,
+      validate(value) {
+        if (!validator.isEmail(value))
+          throw new Error("Invalid Email ID: " + value);
+      },
+    },
     password: { type: String, required: true, minLength: 6 },
     age: { type: Number, min: 18 },
     gender: { type: String, enum: ["female", "male"] },
