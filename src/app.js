@@ -12,7 +12,7 @@ app.post("/signup", async (req, res) => {
     await user.save();
     res.send("user added succesfully");
   } catch (error) {
-    res.status(400).send("Error in adding user to the database");
+    res.status(400).send(error.message);
   }
 });
 //get feed of all users
@@ -34,6 +34,30 @@ app.get("/user", async (req, res) => {
     } else {
       res.status(404).send("user not found");
     }
+  } catch (error) {
+    res.status(400).send("some error occured");
+  }
+});
+
+//delete user by id
+app.delete("/user", async (req, res) => {
+  try {
+    const userId = req.body.userId;
+    const deleted = await User.findByIdAndDelete({ _id: userId });
+    res.send("user deleted successfully");
+  } catch (error) {
+    res.status(400).send("some error occured");
+  }
+});
+app.patch("/user", async (req, res) => {
+  try {
+    const userId = req.body.userId;
+    const data = req.body;
+    const newUser = await User.findByIdAndUpdate({ _id: userId }, data, {
+      returnDocument: "after",
+    });
+    console.log(newUser);
+    res.send("user updated successfully");
   } catch (error) {
     res.status(400).send("some error occured");
   }
